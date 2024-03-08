@@ -10,7 +10,7 @@ import (
 	"github.com/stdyum/api-schedule/internal/modules/types_registry"
 )
 
-func New(database *gocql.Session, registry types_registry.IController) (server.Routes, controllers.Controller, error) {
+func New(database *gocql.Session, registry types_registry.Controller) (server.Routes, controllers.Controller, error) {
 	repo := repositories.New(database)
 
 	ctrl := controllers.New(repo, registry)

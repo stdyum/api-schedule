@@ -11,6 +11,11 @@ type ScheduleResponseDTO struct {
 	Info    ScheduleInfoResponseDTO     `json:"info"`
 }
 
+type ScheduleGeneralResponseDTO struct {
+	Lessons []ScheduleLessonGeneralResponseDTO `json:"lessons"`
+	Info    ScheduleInfoResponseDTO            `json:"info"`
+}
+
 type ScheduleLessonResponseDTO struct {
 	ID             uuid.UUID                        `json:"id"`
 	StudyPlaceId   uuid.UUID                        `json:"studyPlaceId"`
@@ -20,6 +25,20 @@ type ScheduleLessonResponseDTO struct {
 	Teacher        ScheduleLessonTeacherResponseDTO `json:"teacher"`
 	StartTime      time.Time                        `json:"startTime"`
 	EndTime        time.Time                        `json:"endTime"`
+	LessonIndex    int                              `json:"lessonIndex"`
+	PrimaryColor   string                           `json:"primaryColor"`
+	SecondaryColor string                           `json:"secondaryColor"`
+}
+
+type ScheduleLessonGeneralResponseDTO struct {
+	ID             uuid.UUID                        `json:"id"`
+	StudyPlaceId   uuid.UUID                        `json:"studyPlaceId"`
+	Group          ScheduleLessonGroupResponseDTO   `json:"group"`
+	Room           ScheduleLessonRoomResponseDTO    `json:"room"`
+	Subject        ScheduleLessonSubjectResponseDTO `json:"subject"`
+	Teacher        ScheduleLessonTeacherResponseDTO `json:"teacher"`
+	StartTime      time.Duration                    `json:"startTime"`
+	EndTime        time.Duration                    `json:"endTime"`
 	LessonIndex    int                              `json:"lessonIndex"`
 	PrimaryColor   string                           `json:"primaryColor"`
 	SecondaryColor string                           `json:"secondaryColor"`

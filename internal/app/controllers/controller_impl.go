@@ -31,42 +31,27 @@ func (c *controller) Schedule(ctx context.Context, enrollment models.Enrollment,
 		teachersMap[lesson.TeacherId] = true
 	}
 
-	groupIds := make([]uuid.UUID, 0, len(groupsMap))
+	typesIds := models.TypesIds{
+		GroupsIds:   make([]uuid.UUID, 0, len(groupsMap)),
+		RoomsIds:    make([]uuid.UUID, 0, len(roomsMap)),
+		SubjectsIds: make([]uuid.UUID, 0, len(subjectsMap)),
+		TeachersIds: make([]uuid.UUID, 0, len(teachersMap)),
+	}
+
 	for id := range groupsMap {
-		groupIds = append(groupIds, id)
+		typesIds.GroupsIds = append(typesIds.GroupsIds, id)
 	}
-
-	roomsIds := make([]uuid.UUID, 0, len(roomsMap))
 	for id := range roomsMap {
-		roomsIds = append(roomsIds, id)
+		typesIds.RoomsIds = append(typesIds.RoomsIds, id)
 	}
-
-	subjectsIds := make([]uuid.UUID, 0, len(subjectsMap))
 	for id := range subjectsMap {
-		subjectsIds = append(subjectsIds, id)
+		typesIds.SubjectsIds = append(typesIds.SubjectsIds, id)
 	}
-
-	teachersIds := make([]uuid.UUID, 0, len(teachersMap))
 	for id := range teachersMap {
-		teachersIds = append(teachersIds, id)
+		typesIds.TeachersIds = append(typesIds.TeachersIds, id)
 	}
 
-	groups, err := c.registry.GetGroupsByIds(ctx, enrollment, groupIds)
-	if err != nil {
-		return dto.ScheduleResponseDTO{}, err
-	}
-
-	rooms, err := c.registry.GetRoomsByIds(ctx, enrollment, roomsIds)
-	if err != nil {
-		return dto.ScheduleResponseDTO{}, err
-	}
-
-	subjects, err := c.registry.GetSubjectsByIds(ctx, enrollment, subjectsIds)
-	if err != nil {
-		return dto.ScheduleResponseDTO{}, err
-	}
-
-	teachers, err := c.registry.GetTeachersByIds(ctx, enrollment, teachersIds)
+	typesModels, err := c.registry.GetTypesByIds(ctx, enrollment, typesIds)
 	if err != nil {
 		return dto.ScheduleResponseDTO{}, err
 	}
@@ -75,10 +60,10 @@ func (c *controller) Schedule(ctx context.Context, enrollment models.Enrollment,
 		return schedule.Lesson{
 			ID:             item.ID,
 			StudyPlaceId:   item.StudyPlaceId,
-			Group:          groups[item.GroupId],
-			Room:           rooms[item.RoomId],
-			Subject:        subjects[item.SubjectId],
-			Teacher:        teachers[item.TeacherId],
+			Group:          typesModels.GroupsIds[item.GroupId],
+			Room:           typesModels.RoomsIds[item.RoomId],
+			Subject:        typesModels.SubjectsIds[item.SubjectId],
+			Teacher:        typesModels.TeachersIds[item.TeacherId],
 			StartTime:      item.StartTime,
 			EndTime:        item.EndTime,
 			LessonIndex:    item.LessonIndex,
@@ -123,6 +108,10 @@ func (c *controller) Schedule(ctx context.Context, enrollment models.Enrollment,
 			EndDate:      to,
 		},
 	}, nil
+}
+
+func (c *controller) ScheduleGeneral(ctx context.Context, enrollment models.Enrollment, column string, columnId uuid.UUID) (dto.ScheduleGeneralResponseDTO, error) {
+	return dto.ScheduleGeneralResponseDTO{}, nil
 }
 
 func (c *controller) CreateScheduleMeta(ctx context.Context, enrollment models.Enrollment, request dto.CreateScheduleMetaRequestDTO) (dto.CreateScheduleMetaResponseDTO, error) {

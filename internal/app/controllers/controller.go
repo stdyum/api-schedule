@@ -26,9 +26,9 @@ type Controller interface {
 
 type controller struct {
 	repository repositories.Repository
-	registry   types_registry.IController
+	registry   types_registry.Controller
 }
 
-func New(repository repositories.Repository, registry types_registry.IController) Controller {
+func New(repository repositories.Repository, registry types_registry.Controller) Controller {
 	return &controller{repository: repository, registry: registry}
 }

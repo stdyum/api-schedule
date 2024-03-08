@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS schedule.schedule
     created_at      timestamp,
     updated_at      timestamp,
 
-    PRIMARY KEY (id)
-);
+    PRIMARY KEY ((study_place_id), date, status)
+) WITH CLUSTERING ORDER BY (date DESC);
 
 -- +goose StatementEnd

@@ -3,12 +3,12 @@
 
 CREATE TABLE IF NOT EXISTS schedule.lessons_general
 (
-    id              UUID,
-    study_place_id  UUID,
-    subject_id      UUID,
-    teacher_id      UUID,
-    group_id        UUID,
-    room_id         UUID,
+    id              uuid,
+    study_place_id  uuid,
+    subject_id      uuid,
+    teacher_id      uuid,
+    group_id        uuid,
+    room_id         uuid,
     lesson_index    int,
     start_time      time,
     end_time        time,
@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS schedule.lessons_general
     created_at      timestamp,
     updated_at      timestamp,
 
-    PRIMARY KEY (id)
-);
+    PRIMARY KEY ((study_place_id), day_index, id)
+) WITH CLUSTERING ORDER BY (day_index DESC);
+
 
 -- +goose StatementEnd

@@ -26,10 +26,13 @@ func (r *repository) GetSchedule(ctx context.Context, studyPlaceId uuid.UUID, co
 		days[from.AddDate(0, 0, i)] = &day{}
 	}
 
-	scanner := r.database.Query(`
+	//language=SQL
+	query := `
 SELECT id, study_place_id, date, status FROM schedule.schedule
-	WHERE date > ? AND date < ? AND study_place_id = ? ALLOW FILTERING
-`,
+	WHERE date > ? AND date < ? AND study_place_id = ?
+`
+
+	scanner := r.database.Query(query,
 		from,
 		to,
 		gocql.UUID(studyPlaceId),
@@ -72,12 +75,15 @@ SELECT id, study_place_id, date, status FROM schedule.schedule
 		}
 	}
 
-	scanner = r.database.Query(fmt.Sprintf(`
+	//language=SQL
+	query = fmt.Sprintf(`
 SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, date, start_time, end_time, lesson_index, primary_color, secondary_color  FROM schedule.lessons 
-    WHERE date IN ? AND study_place_id = ? AND %s = ? ALLOW FILTERING
-`, column),
-		currentLessonsTime,
+    WHERE study_place_id = ? AND date IN ? AND %s = ?
+`, column)
+
+	scanner = r.database.Query(query,
 		gocql.UUID(studyPlaceId),
+		currentLessonsTime,
 		gocql.UUID(columnId),
 	).WithContext(ctx).Iter().Scanner()
 
@@ -89,12 +95,15 @@ SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, date, star
 		return nil, err
 	}
 
-	scanner = r.database.Query(fmt.Sprintf(`
-SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, start_time, end_time, day_index, lesson_index, primary_color, secondary_color  FROM lessons_general 
-    WHERE day_index IN ? AND study_place_id = ? AND %s = ? ALLOW FILTERING
-`, column),
-		generalLessonsIndexes,
+	//language=SQL
+	query = fmt.Sprintf(`
+SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, start_time, end_time, day_index, lesson_index, primary_color, secondary_color FROM lessons_general 
+    WHERE study_place_id = ? AND day_index IN ? AND %s = ?
+`, column)
+
+	scanner = r.database.Query(query,
 		gocql.UUID(studyPlaceId),
+		generalLessonsIndexes,
 		gocql.UUID(columnId),
 	).WithContext(ctx).Iter().Scanner()
 
@@ -160,6 +169,20 @@ SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, start_time
 
 	return lessons, nil
 }
+
+//
+//func (r *repository) GetScheduleGeneral(ctx context.Context, studyPlaceId uuid.UUID, column entities.Column, columnId uuid.UUID) ([]entities.ScheduleLesson, error) {
+//	//language=SQL
+//	query := fmt.Sprintf(`
+//SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, start_time, end_time, day_index, lesson_index, primary_color, secondary_color FROM lessons_general
+//    WHERE study_place_id = ? AND %s = ? ALLOW FILTERING
+//`, column)
+//
+//	r.database.Query(query,
+//		studyPlaceId,
+//		columnId,
+//	).WithContext(ctx)
+//}
 
 func (r *repository) CreateScheduleMeta(ctx context.Context, meta []entities.Schedule) error {
 	query := "BEGIN BATCH"
