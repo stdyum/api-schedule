@@ -11,6 +11,7 @@ import (
 
 type Repository interface {
 	GetSchedule(ctx context.Context, studyPlaceId uuid.UUID, column entities.Column, columnId uuid.UUID, from, to time.Time) ([]entities.ScheduleLesson, error)
+	GetScheduleGeneral(ctx context.Context, studyPlaceId uuid.UUID, column entities.Column, columnId uuid.UUID) ([]entities.LessonGeneral, error)
 	CreateScheduleMeta(ctx context.Context, meta []entities.Schedule) error
 
 	CreateLessons(ctx context.Context, lesson []entities.Lesson) error

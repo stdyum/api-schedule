@@ -36,3 +36,22 @@ func (h *http) Schedule(ctx *hc.Context) {
 
 	ctx.JSON(netHttp.StatusOK, schedule)
 }
+
+func (h *http) ScheduleGeneral(ctx *hc.Context) {
+	enrollment := ctx.Enrollment()
+
+	column := ctx.Query("column")
+	columnId, err := ctx.QueryUUID("columnId")
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	schedule, err := h.controller.ScheduleGeneral(ctx, enrollment, column, columnId)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(netHttp.StatusOK, schedule)
+}

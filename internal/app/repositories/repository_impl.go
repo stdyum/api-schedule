@@ -170,19 +170,28 @@ SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, start_time
 	return lessons, nil
 }
 
-//
-//func (r *repository) GetScheduleGeneral(ctx context.Context, studyPlaceId uuid.UUID, column entities.Column, columnId uuid.UUID) ([]entities.ScheduleLesson, error) {
-//	//language=SQL
-//	query := fmt.Sprintf(`
-//SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, start_time, end_time, day_index, lesson_index, primary_color, secondary_color FROM lessons_general
-//    WHERE study_place_id = ? AND %s = ? ALLOW FILTERING
-//`, column)
-//
-//	r.database.Query(query,
-//		studyPlaceId,
-//		columnId,
-//	).WithContext(ctx)
-//}
+func (r *repository) GetScheduleGeneral(ctx context.Context, studyPlaceId uuid.UUID, column entities.Column, columnId uuid.UUID) ([]entities.LessonGeneral, error) {
+	//language=SQL
+	query := fmt.Sprintf(`
+SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, start_time, end_time, day_index, lesson_index, primary_color, secondary_color FROM lessons_general 
+    WHERE study_place_id = ? AND %s = ?
+`, column)
+
+	scanner := r.database.Query(query,
+		gocql.UUID(studyPlaceId),
+		gocql.UUID(columnId),
+	).WithContext(ctx).Iter().Scanner()
+
+	lessons, err := databases.ScanArray(scanner, r.scanLessonGeneral)
+	if err != nil {
+		if err := scanner.Err(); err != nil {
+			return nil, err
+		}
+		return nil, err
+	}
+
+	return lessons, nil
+}
 
 func (r *repository) CreateScheduleMeta(ctx context.Context, meta []entities.Schedule) error {
 	query := "BEGIN BATCH"

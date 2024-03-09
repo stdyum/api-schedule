@@ -14,8 +14,11 @@ type Lesson struct {
 	Room           models.Room
 	Subject        models.Subject
 	Teacher        models.Teacher
-	StartTime      time.Time
-	EndTime        time.Time
+	StartDateTime  time.Time
+	EndDateTime    time.Time
+	StartTime      time.Duration
+	EndTime        time.Duration
+	DayIndex       int
 	LessonIndex    int
 	PrimaryColor   string
 	SecondaryColor string

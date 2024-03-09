@@ -10,6 +10,7 @@ type HTTP interface {
 	confHttp.Routes
 
 	Schedule(ctx *hc.Context)
+	ScheduleGeneral(ctx *hc.Context)
 
 	CreateLesson(ctx *hc.Context)
 	UpdateLesson(ctx *hc.Context)

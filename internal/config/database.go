@@ -63,6 +63,10 @@ func runMigrations(db *gocql.Session, keyspace string) error {
 	}
 
 	// ignore error because of 'no change'
-	_ = migrations.Up()
+	err = migrations.Up()
+	if err != nil && err.Error() != "no change" {
+		return err
+	}
+
 	return nil
 }

@@ -14,6 +14,7 @@ func (h *http) ConfigureRoutes() *hc.Engine {
 	v1 := engine.Group("api/v1", hc.Logger(), middlewares.ErrorMiddleware())
 
 	v1.Use(middlewares.EnrollmentAuthMiddleware()).GET("schedule", h.Schedule)
+	v1.Use(middlewares.EnrollmentAuthMiddleware()).GET("schedule/general", h.ScheduleGeneral)
 
 	{
 		lessonsGroup := v1.Group("lessons").Use(middlewares.EnrollmentAuthMiddleware())

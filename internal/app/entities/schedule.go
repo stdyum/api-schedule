@@ -25,6 +25,7 @@ type ScheduleLesson struct {
 	TeacherId      uuid.UUID
 	StartTime      time.Time
 	EndTime        time.Time
+	DayIndex       int
 	LessonIndex    int
 	PrimaryColor   string
 	SecondaryColor string

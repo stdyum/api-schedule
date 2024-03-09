@@ -13,6 +13,7 @@ import (
 
 type Controller interface {
 	Schedule(ctx context.Context, enrollment models.Enrollment, column string, columnId uuid.UUID, from, to time.Time) (dto.ScheduleResponseDTO, error)
+	ScheduleGeneral(ctx context.Context, enrollment models.Enrollment, column string, columnId uuid.UUID) (dto.ScheduleGeneralResponseDTO, error)
 	CreateScheduleMeta(ctx context.Context, enrollment models.Enrollment, request dto.CreateScheduleMetaRequestDTO) (dto.CreateScheduleMetaResponseDTO, error)
 
 	CreateLessons(ctx context.Context, enrollment models.Enrollment, request dto.CreateLessonsRequestDTO) (dto.CreateLessonsResponseDTO, error)
