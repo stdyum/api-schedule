@@ -8,7 +8,7 @@ import (
 	schedule "github.com/stdyum/api-schedule/internal/app/models"
 )
 
-func (c *controller) fillScheduleTypes(ctx context.Context, enrollment models.Enrollment, lessons []schedule.Lesson) error {
+func (c *controller) fillScheduleTypes(ctx context.Context, enrollment models.Enrollment, lessons []schedule.Lesson) (models.TypesModels, error) {
 	groupsMap := make(map[uuid.UUID]bool)
 	roomsMap := make(map[uuid.UUID]bool)
 	subjectsMap := make(map[uuid.UUID]bool)
@@ -43,7 +43,7 @@ func (c *controller) fillScheduleTypes(ctx context.Context, enrollment models.En
 
 	types, err := c.registry.GetTypesByIds(ctx, enrollment, typesIds)
 	if err != nil {
-		return err
+		return models.TypesModels{}, err
 	}
 
 	for i := range lessons {
@@ -53,5 +53,5 @@ func (c *controller) fillScheduleTypes(ctx context.Context, enrollment models.En
 		lessons[i].Teacher = types.TeachersIds[lessons[i].Teacher.ID]
 	}
 
-	return nil
+	return types, nil
 }

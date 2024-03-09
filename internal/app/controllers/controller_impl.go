@@ -49,7 +49,8 @@ func (c *controller) Schedule(ctx context.Context, enrollment models.Enrollment,
 		}
 	})
 
-	if err = c.fillScheduleTypes(ctx, enrollment, lessons); err != nil {
+	types, err := c.fillScheduleTypes(ctx, enrollment, lessons)
+	if err != nil {
 		return dto.ScheduleResponseDTO{}, err
 	}
 
@@ -83,8 +84,8 @@ func (c *controller) Schedule(ctx context.Context, enrollment models.Enrollment,
 		}),
 		Info: dto.ScheduleInfoResponseDTO{
 			StudyPlaceId: enrollment.StudyPlaceId,
-			Column:       string(col),
-			ColumnName:   "--",
+			Column:       col.String(),
+			ColumnName:   col.Name(types, columnId),
 			StartDate:    from,
 			EndDate:      to,
 		},
@@ -127,7 +128,8 @@ func (c *controller) ScheduleGeneral(ctx context.Context, enrollment models.Enro
 		}
 	})
 
-	if err = c.fillScheduleTypes(ctx, enrollment, lessons); err != nil {
+	types, err := c.fillScheduleTypes(ctx, enrollment, lessons)
+	if err != nil {
 		return dto.ScheduleGeneralResponseDTO{}, err
 	}
 
@@ -162,8 +164,8 @@ func (c *controller) ScheduleGeneral(ctx context.Context, enrollment models.Enro
 		}),
 		Info: dto.ScheduleInfoResponseDTO{
 			StudyPlaceId: enrollment.StudyPlaceId,
-			Column:       string(col),
-			ColumnName:   "--",
+			Column:       col.String(),
+			ColumnName:   col.Name(types, columnId),
 		},
 	}, nil
 }
