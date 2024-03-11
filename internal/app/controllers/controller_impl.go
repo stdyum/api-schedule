@@ -28,6 +28,7 @@ func (c *controller) Schedule(ctx context.Context, enrollment models.Enrollment,
 		return schedule.Lesson{
 			ID:           item.ID,
 			StudyPlaceId: item.StudyPlaceId,
+			Type:         string(item.Type),
 			Group: models.Group{
 				ID: item.GroupId,
 			},
@@ -59,6 +60,7 @@ func (c *controller) Schedule(ctx context.Context, enrollment models.Enrollment,
 			return dto.ScheduleLessonResponseDTO{
 				ID:           item.ID,
 				StudyPlaceId: item.StudyPlaceId,
+				Type:         item.Type,
 				Group: dto.ScheduleLessonGroupResponseDTO{
 					ID:   item.Group.ID,
 					Name: item.Group.Name,
@@ -85,6 +87,7 @@ func (c *controller) Schedule(ctx context.Context, enrollment models.Enrollment,
 		Info: dto.ScheduleInfoResponseDTO{
 			StudyPlaceId: enrollment.StudyPlaceId,
 			Column:       col.String(),
+			ColumnId:     columnId,
 			ColumnName:   col.Name(types, columnId),
 			StartDate:    from,
 			EndDate:      to,
@@ -164,6 +167,7 @@ func (c *controller) ScheduleGeneral(ctx context.Context, enrollment models.Enro
 		}),
 		Info: dto.ScheduleInfoResponseDTO{
 			StudyPlaceId: enrollment.StudyPlaceId,
+			ColumnId:     columnId,
 			Column:       col.String(),
 			ColumnName:   col.Name(types, columnId),
 		},

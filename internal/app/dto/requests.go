@@ -46,7 +46,7 @@ type CreateLessonsGeneralRequestDTO struct {
 
 type UpdateLessonGeneralRequestDTO struct {
 	ID uuid.UUID `json:"id"`
-	CreateLessonEntryRequestDTO
+	CreateLessonGeneralEntryRequestDTO
 }
 
 type CreateScheduleMetaEntryRequestDTO struct {

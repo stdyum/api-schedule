@@ -79,7 +79,7 @@ SELECT id, study_place_id, date, status FROM schedule.schedule
 	query = fmt.Sprintf(`
 SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, date, start_time, end_time, lesson_index, primary_color, secondary_color  FROM schedule.lessons 
     WHERE study_place_id = ? AND date IN ? AND %s = ?
-`, column)
+`, string(column))
 
 	scanner = r.database.Query(query,
 		gocql.UUID(studyPlaceId),
@@ -99,7 +99,7 @@ SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, date, star
 	query = fmt.Sprintf(`
 SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, start_time, end_time, day_index, lesson_index, primary_color, secondary_color FROM lessons_general 
     WHERE study_place_id = ? AND day_index IN ? AND %s = ?
-`, column)
+`, string(column))
 
 	scanner = r.database.Query(query,
 		gocql.UUID(studyPlaceId),
@@ -119,6 +119,7 @@ SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, start_time
 		return entities.ScheduleLesson{
 			ID:             item.ID,
 			StudyPlaceId:   item.StudyPlaceId,
+			Type:           entities.ScheduleLessonTypeCurrent,
 			GroupId:        item.GroupId,
 			RoomId:         item.RoomId,
 			SubjectId:      item.SubjectId,
@@ -146,6 +147,7 @@ SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, start_time
 			return entities.ScheduleLesson{
 				ID:             item.ID,
 				StudyPlaceId:   item.StudyPlaceId,
+				Type:           entities.ScheduleLessonTypeGeneral,
 				GroupId:        item.GroupId,
 				RoomId:         item.RoomId,
 				SubjectId:      item.SubjectId,
@@ -175,7 +177,7 @@ func (r *repository) GetScheduleGeneral(ctx context.Context, studyPlaceId uuid.U
 	query := fmt.Sprintf(`
 SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, start_time, end_time, day_index, lesson_index, primary_color, secondary_color FROM lessons_general 
     WHERE study_place_id = ? AND %s = ?
-`, column)
+`, string(column))
 
 	scanner := r.database.Query(query,
 		gocql.UUID(studyPlaceId),

@@ -62,7 +62,7 @@ func (c *controller) UpdateLessonGeneral(ctx context.Context, enrollment models.
 		return err
 	}
 
-	lesson := entities.Lesson{
+	lesson := entities.LessonGeneral{
 		ID:             request.ID,
 		StudyPlaceId:   enrollment.StudyPlaceId,
 		GroupId:        request.GroupId,
@@ -71,18 +71,19 @@ func (c *controller) UpdateLessonGeneral(ctx context.Context, enrollment models.
 		TeacherId:      request.TeacherId,
 		StartTime:      request.StartTime,
 		EndTime:        request.EndTime,
+		DayIndex:       request.DayIndex,
 		LessonIndex:    request.LessonIndex,
 		PrimaryColor:   request.PrimaryColor,
 		SecondaryColor: request.SecondaryColor,
 	}
 
-	return c.repository.UpdateLesson(ctx, lesson)
+	return c.repository.UpdateGeneralLesson(ctx, lesson)
 }
 
-func (c *controller) DeleteLessonGeneralById(ctx context.Context, enrollment models.Enrollment, id uuid.UUID) error {
+func (c *controller) DeleteLessonGeneralById(ctx context.Context, enrollment models.Enrollment, dayIndex int, id uuid.UUID) error {
 	if err := enrollment.Permissions.Assert(models.PermissionSchedule); err != nil {
 		return err
 	}
 
-	return c.repository.DeleteLessonById(ctx, enrollment.StudyPlaceId, id)
+	return c.repository.DeleteGeneralLessonById(ctx, enrollment.StudyPlaceId, dayIndex, id)
 }

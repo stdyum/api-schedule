@@ -33,9 +33,9 @@ func (c Column) String() (out string) {
 	case ColumnSubject:
 		out = "subject"
 	case ColumnRoom:
-		out = "group"
-	case ColumnGroup:
 		out = "room"
+	case ColumnGroup:
+		out = "group"
 	case ColumnTeacher:
 		out = "teacher"
 	default:
@@ -50,9 +50,9 @@ func (c Column) Name(types models.TypesModels, id uuid.UUID) (out string) {
 	case ColumnSubject:
 		out = types.SubjectsIds[id].Name
 	case ColumnRoom:
-		out = types.GroupsIds[id].Name
-	case ColumnGroup:
 		out = types.RoomsIds[id].Name
+	case ColumnGroup:
+		out = types.GroupsIds[id].Name
 	case ColumnTeacher:
 		out = types.TeachersIds[id].Name
 	default:

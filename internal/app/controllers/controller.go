@@ -18,11 +18,11 @@ type Controller interface {
 
 	CreateLessons(ctx context.Context, enrollment models.Enrollment, request dto.CreateLessonsRequestDTO) (dto.CreateLessonsResponseDTO, error)
 	UpdateLesson(ctx context.Context, enrollment models.Enrollment, request dto.UpdateLessonRequestDTO) error
-	DeleteLessonById(ctx context.Context, enrollment models.Enrollment, id uuid.UUID) error
+	DeleteLessonById(ctx context.Context, enrollment models.Enrollment, date time.Time, id uuid.UUID) error
 
 	CreateLessonsGeneral(ctx context.Context, enrollment models.Enrollment, request dto.CreateLessonsGeneralRequestDTO) (dto.CreateLessonsGeneralResponseDTO, error)
 	UpdateLessonGeneral(ctx context.Context, enrollment models.Enrollment, request dto.UpdateLessonGeneralRequestDTO) error
-	DeleteLessonGeneralById(ctx context.Context, enrollment models.Enrollment, id uuid.UUID) error
+	DeleteLessonGeneralById(ctx context.Context, enrollment models.Enrollment, dayIndex int, id uuid.UUID) error
 }
 
 type controller struct {

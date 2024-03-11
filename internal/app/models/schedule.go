@@ -10,6 +10,7 @@ import (
 type Lesson struct {
 	ID             uuid.UUID
 	StudyPlaceId   uuid.UUID
+	Type           string
 	Group          models.Group
 	Room           models.Room
 	Subject        models.Subject

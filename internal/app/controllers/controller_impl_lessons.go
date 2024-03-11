@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/stdyum/api-common/models"
@@ -77,10 +78,10 @@ func (c *controller) UpdateLesson(ctx context.Context, enrollment models.Enrollm
 	return c.repository.UpdateLesson(ctx, lesson)
 }
 
-func (c *controller) DeleteLessonById(ctx context.Context, enrollment models.Enrollment, id uuid.UUID) error {
+func (c *controller) DeleteLessonById(ctx context.Context, enrollment models.Enrollment, date time.Time, id uuid.UUID) error {
 	if err := enrollment.Permissions.Assert(models.PermissionSchedule); err != nil {
 		return err
 	}
 
-	return c.repository.DeleteLessonById(ctx, enrollment.StudyPlaceId, id)
+	return c.repository.DeleteLessonById(ctx, enrollment.StudyPlaceId, date, id)
 }

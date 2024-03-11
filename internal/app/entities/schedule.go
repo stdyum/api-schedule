@@ -7,6 +7,13 @@ import (
 	"github.com/stdyum/api-common/entities"
 )
 
+type ScheduleLessonType string
+
+const (
+	ScheduleLessonTypeCurrent ScheduleLessonType = "current"
+	ScheduleLessonTypeGeneral ScheduleLessonType = "general"
+)
+
 type Schedule struct {
 	entities.Timed
 
@@ -19,6 +26,7 @@ type Schedule struct {
 type ScheduleLesson struct {
 	ID             uuid.UUID
 	StudyPlaceId   uuid.UUID
+	Type           ScheduleLessonType
 	GroupId        uuid.UUID
 	RoomId         uuid.UUID
 	SubjectId      uuid.UUID

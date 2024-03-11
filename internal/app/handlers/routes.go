@@ -3,7 +3,6 @@ package handlers
 import (
 	"github.com/stdyum/api-common/hc"
 	"github.com/stdyum/api-common/http/middlewares"
-	"github.com/stdyum/api-common/proto/impl/studyplaces"
 	"google.golang.org/grpc"
 )
 
@@ -24,11 +23,17 @@ func (h *http) ConfigureRoutes() *hc.Engine {
 		lessonsGroup.DELETE(":id", h.DeleteLesson)
 	}
 
+	{
+		lessonsGeneralGroup := v1.Group("lessons/general").Use(middlewares.EnrollmentAuthMiddleware())
+
+		lessonsGeneralGroup.POST("", h.CreateLessonGeneral)
+		lessonsGeneralGroup.PUT("", h.UpdateLessonGeneral)
+		lessonsGeneralGroup.DELETE(":id", h.DeleteLessonGeneral)
+	}
+
 	return engine
 }
 
 func (h *gRPC) ConfigureRoutes() *grpc.Server {
-	grpcServer := grpc.NewServer()
-	studyplaces.RegisterStudyplacesServer(grpcServer, h)
-	return grpcServer
+	return nil
 }

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"time"
 
 	"github.com/gocql/gocql"
 	"github.com/google/uuid"
@@ -40,13 +41,15 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, dateOf(now()), dateOf(now()));
 }
 
 func (r *repository) UpdateLesson(ctx context.Context, lesson entities.Lesson) error {
-	return r.database.Query(`
+	//todo set date
+
+	//language=SQL
+	err := r.database.Query(`
 UPDATE schedule.lessons SET  
 	group_id = ?,
 	room_id = ?,
 	subject_id = ?,
 	teacher_id = ?,
-	date = toDate(?),
 	start_time = ?,
 	end_time = ?,
 	lesson_index = ?,
@@ -54,28 +57,32 @@ UPDATE schedule.lessons SET
 	secondary_color = ?,
 	updated_at = dateOf(now())
 WHERE 
-    id = ? AND study_place_id = ?
+    study_place_id = ? AND date = ? AND id = ? 
+IF EXISTS
 `,
 		gocql.UUID(lesson.GroupId),
 		gocql.UUID(lesson.RoomId),
 		gocql.UUID(lesson.SubjectId),
 		gocql.UUID(lesson.TeacherId),
 		lesson.StartTime,
-		lesson.StartTime,
 		lesson.EndTime,
 		lesson.LessonIndex,
 		lesson.PrimaryColor,
 		lesson.SecondaryColor,
-		gocql.UUID(lesson.ID),
 		gocql.UUID(lesson.StudyPlaceId),
+		lesson.StartTime,
+		gocql.UUID(lesson.ID),
 	).WithContext(ctx).Exec()
+
+	return err
 }
 
-func (r *repository) DeleteLessonById(ctx context.Context, studyPlaceId uuid.UUID, id uuid.UUID) error {
+func (r *repository) DeleteLessonById(ctx context.Context, studyPlaceId uuid.UUID, date time.Time, id uuid.UUID) error {
 	return r.database.Query(`
-DELETE FROM schedule.lessons WHERE id = ? AND study_place_id = ?
+DELETE FROM schedule.lessons WHERE study_place_id = ? AND date = ? AND id = ?
 `,
-		gocql.UUID(id),
 		gocql.UUID(studyPlaceId),
+		date,
+		gocql.UUID(id),
 	).WithContext(ctx).Exec()
 }

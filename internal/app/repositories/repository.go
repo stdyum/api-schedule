@@ -16,11 +16,11 @@ type Repository interface {
 
 	CreateLessons(ctx context.Context, lesson []entities.Lesson) error
 	UpdateLesson(ctx context.Context, lesson entities.Lesson) error
-	DeleteLessonById(ctx context.Context, studyPlaceId uuid.UUID, id uuid.UUID) error
+	DeleteLessonById(ctx context.Context, studyPlaceId uuid.UUID, date time.Time, id uuid.UUID) error
 
 	CreateGeneralLessons(ctx context.Context, lesson []entities.LessonGeneral) error
 	UpdateGeneralLesson(ctx context.Context, lesson entities.LessonGeneral) error
-	DeleteGeneralLessonById(ctx context.Context, studyPlaceId uuid.UUID, id uuid.UUID) error
+	DeleteGeneralLessonById(ctx context.Context, studyPlaceId uuid.UUID, dayIndex int, id uuid.UUID) error
 }
 
 type repository struct {

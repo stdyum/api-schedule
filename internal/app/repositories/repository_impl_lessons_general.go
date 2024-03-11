@@ -49,34 +49,35 @@ UPDATE schedule.lessons_general SET
 	teacher_id = ?,
 	start_time = ?,
 	end_time = ?,
-	day_index = ?,
 	lesson_index = ?,
 	primary_color = ?,
 	secondary_color = ?,
 	updated_at = dateOf(now())
 WHERE 
-    id = ? AND study_place_id = ?
+    study_place_id = ? AND day_index = ? AND id = ? 
+IF EXISTS
 `,
-		lesson.ID,
-		lesson.StudyPlaceId,
-		lesson.GroupId,
-		lesson.RoomId,
-		lesson.SubjectId,
-		lesson.TeacherId,
+		gocql.UUID(lesson.GroupId),
+		gocql.UUID(lesson.RoomId),
+		gocql.UUID(lesson.SubjectId),
+		gocql.UUID(lesson.TeacherId),
 		lesson.StartTime,
 		lesson.EndTime,
-		lesson.DayIndex,
 		lesson.LessonIndex,
 		lesson.PrimaryColor,
 		lesson.SecondaryColor,
+		gocql.UUID(lesson.StudyPlaceId),
+		lesson.DayIndex,
+		gocql.UUID(lesson.ID),
 	).WithContext(ctx).Exec()
 }
 
-func (r *repository) DeleteGeneralLessonById(ctx context.Context, studyPlaceId uuid.UUID, id uuid.UUID) error {
+func (r *repository) DeleteGeneralLessonById(ctx context.Context, studyPlaceId uuid.UUID, dayIndex int, id uuid.UUID) error {
 	return r.database.Query(`
-DELETE FROM schedule.lessons_general WHERE id = ? AND study_place_id = ?
+DELETE FROM schedule.lessons_general WHERE study_place_id = ? AND day_index = ? AND id = ?
 `,
-		gocql.UUID(id),
 		gocql.UUID(studyPlaceId),
+		dayIndex,
+		gocql.UUID(id),
 	).WithContext(ctx).Exec()
 }

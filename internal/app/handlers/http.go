@@ -15,6 +15,10 @@ type HTTP interface {
 	CreateLesson(ctx *hc.Context)
 	UpdateLesson(ctx *hc.Context)
 	DeleteLesson(ctx *hc.Context)
+
+	CreateLessonGeneral(ctx *hc.Context)
+	UpdateLessonGeneral(ctx *hc.Context)
+	DeleteLessonGeneral(ctx *hc.Context)
 }
 
 type http struct {

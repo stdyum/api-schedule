@@ -19,6 +19,7 @@ type ScheduleGeneralResponseDTO struct {
 type ScheduleLessonResponseDTO struct {
 	ID             uuid.UUID                        `json:"id"`
 	StudyPlaceId   uuid.UUID                        `json:"studyPlaceId"`
+	Type           string                           `json:"type"`
 	Group          ScheduleLessonGroupResponseDTO   `json:"group"`
 	Room           ScheduleLessonRoomResponseDTO    `json:"room"`
 	Subject        ScheduleLessonSubjectResponseDTO `json:"subject"`
@@ -68,6 +69,7 @@ type ScheduleLessonTeacherResponseDTO struct {
 type ScheduleInfoResponseDTO struct {
 	StudyPlaceId uuid.UUID `json:"studyPlaceId"`
 	Column       string    `json:"column"`
+	ColumnId     uuid.UUID `json:"columnId"`
 	ColumnName   string    `json:"columnName"`
 	StartDate    time.Time `json:"startDate"`
 	EndDate      time.Time `json:"endDate"`

@@ -2,18 +2,14 @@ package handlers
 
 import (
 	"github.com/stdyum/api-common/grpc"
-	"github.com/stdyum/api-common/proto/impl/studyplaces"
 	"github.com/stdyum/api-schedule/internal/app/controllers"
 )
 
 type GRPC interface {
 	grpc.Routes
-	studyplaces.StudyplacesServer
 }
 
 type gRPC struct {
-	studyplaces.UnimplementedStudyplacesServer
-
 	controller controllers.Controller
 }
 
