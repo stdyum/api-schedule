@@ -7,7 +7,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.17.0
 	github.com/google/uuid v1.6.0
 	github.com/lib/pq v1.10.9
-	github.com/stdyum/api-common v0.0.0-20240311151332-7c4b2802c1f5
+	github.com/stdyum/api-common v0.0.0-20240315134452-1a54ac67c36e
 	google.golang.org/grpc v1.61.0
 )
 
