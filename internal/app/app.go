@@ -4,6 +4,7 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/stdyum/api-common/server"
 	"github.com/stdyum/api-schedule/internal/app/controllers"
+	"github.com/stdyum/api-schedule/internal/app/controllers/validators"
 	"github.com/stdyum/api-schedule/internal/app/errors"
 	"github.com/stdyum/api-schedule/internal/app/handlers"
 	"github.com/stdyum/api-schedule/internal/app/repositories"
@@ -13,7 +14,8 @@ import (
 func New(database *gocql.Session, registry types_registry.Controller) (server.Routes, controllers.Controller, error) {
 	repo := repositories.New(database)
 
-	ctrl := controllers.New(repo, registry)
+	validator := validators.New()
+	ctrl := controllers.New(validator, repo, registry)
 
 	errors.Register()
 

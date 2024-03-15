@@ -11,6 +11,10 @@ import (
 )
 
 func (c *controller) CreateLessonsGeneral(ctx context.Context, enrollment models.Enrollment, request dto.CreateLessonsGeneralRequestDTO) (dto.CreateLessonsGeneralResponseDTO, error) {
+	if err := c.validator.ValidateCreateLessonsGeneralRequest(ctx, request); err != nil {
+		return dto.CreateLessonsGeneralResponseDTO{}, err
+	}
+
 	if err := enrollment.Permissions.Assert(models.PermissionSchedule); err != nil {
 		return dto.CreateLessonsGeneralResponseDTO{}, err
 	}
@@ -58,6 +62,10 @@ func (c *controller) CreateLessonsGeneral(ctx context.Context, enrollment models
 }
 
 func (c *controller) UpdateLessonGeneral(ctx context.Context, enrollment models.Enrollment, request dto.UpdateLessonGeneralRequestDTO) error {
+	if err := c.validator.ValidateUpdateLessonGeneralRequest(ctx, request); err != nil {
+		return err
+	}
+
 	if err := enrollment.Permissions.Assert(models.PermissionSchedule); err != nil {
 		return err
 	}
@@ -80,10 +88,14 @@ func (c *controller) UpdateLessonGeneral(ctx context.Context, enrollment models.
 	return c.repository.UpdateGeneralLesson(ctx, lesson)
 }
 
-func (c *controller) DeleteLessonGeneralById(ctx context.Context, enrollment models.Enrollment, dayIndex int, id uuid.UUID) error {
+func (c *controller) DeleteLessonGeneralById(ctx context.Context, enrollment models.Enrollment, request dto.DeleteLessonGeneralRequestDTO) error {
+	if err := c.validator.ValidateDeleteLessonGeneralRequest(ctx, request); err != nil {
+		return err
+	}
+
 	if err := enrollment.Permissions.Assert(models.PermissionSchedule); err != nil {
 		return err
 	}
 
-	return c.repository.DeleteGeneralLessonById(ctx, enrollment.StudyPlaceId, dayIndex, id)
+	return c.repository.DeleteGeneralLessonById(ctx, enrollment.StudyPlaceId, request.DayIndex, request.ID)
 }

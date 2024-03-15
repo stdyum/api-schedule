@@ -56,7 +56,12 @@ func (h *http) DeleteLessonGeneral(ctx *hc.Context) {
 		return
 	}
 
-	if err = h.controller.DeleteLessonGeneralById(ctx, enrollment, dayIndex, id); err != nil {
+	request := dto.DeleteLessonGeneralRequestDTO{
+		ID:       id,
+		DayIndex: dayIndex,
+	}
+
+	if err = h.controller.DeleteLessonGeneralById(ctx, enrollment, request); err != nil {
 		_ = ctx.Error(err)
 		return
 	}

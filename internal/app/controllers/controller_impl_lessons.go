@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/stdyum/api-common/models"
@@ -12,6 +11,10 @@ import (
 )
 
 func (c *controller) CreateLessons(ctx context.Context, enrollment models.Enrollment, request dto.CreateLessonsRequestDTO) (dto.CreateLessonsResponseDTO, error) {
+	if err := c.validator.ValidateCreateLessonsRequest(ctx, request); err != nil {
+		return dto.CreateLessonsResponseDTO{}, err
+	}
+
 	if err := enrollment.Permissions.Assert(models.PermissionSchedule); err != nil {
 		return dto.CreateLessonsResponseDTO{}, err
 	}
@@ -57,6 +60,10 @@ func (c *controller) CreateLessons(ctx context.Context, enrollment models.Enroll
 }
 
 func (c *controller) UpdateLesson(ctx context.Context, enrollment models.Enrollment, request dto.UpdateLessonRequestDTO) error {
+	if err := c.validator.ValidateUpdateLessonRequest(ctx, request); err != nil {
+		return err
+	}
+
 	if err := enrollment.Permissions.Assert(models.PermissionSchedule); err != nil {
 		return err
 	}
@@ -78,10 +85,14 @@ func (c *controller) UpdateLesson(ctx context.Context, enrollment models.Enrollm
 	return c.repository.UpdateLesson(ctx, lesson)
 }
 
-func (c *controller) DeleteLessonById(ctx context.Context, enrollment models.Enrollment, date time.Time, id uuid.UUID) error {
+func (c *controller) DeleteLessonById(ctx context.Context, enrollment models.Enrollment, request dto.DeleteLessonRequestDTO) error {
+	if err := c.validator.ValidateDeleteLessonRequest(ctx, request); err != nil {
+		return err
+	}
+
 	if err := enrollment.Permissions.Assert(models.PermissionSchedule); err != nil {
 		return err
 	}
 
-	return c.repository.DeleteLessonById(ctx, enrollment.StudyPlaceId, date, id)
+	return c.repository.DeleteLessonById(ctx, enrollment.StudyPlaceId, request.Date, request.ID)
 }

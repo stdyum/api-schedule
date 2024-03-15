@@ -27,6 +27,11 @@ type UpdateLessonRequestDTO struct {
 	CreateLessonEntryRequestDTO
 }
 
+type DeleteLessonRequestDTO struct {
+	ID   uuid.UUID `json:"id"`
+	Date time.Time `json:"date"`
+}
+
 type CreateLessonGeneralEntryRequestDTO struct {
 	GroupId        uuid.UUID     `json:"groupId"`
 	RoomId         uuid.UUID     `json:"roomId"`
@@ -49,6 +54,11 @@ type UpdateLessonGeneralRequestDTO struct {
 	CreateLessonGeneralEntryRequestDTO
 }
 
+type DeleteLessonGeneralRequestDTO struct {
+	ID       uuid.UUID `json:"id"`
+	DayIndex int       `json:"dayIndex"`
+}
+
 type CreateScheduleMetaEntryRequestDTO struct {
 	Date   time.Time `json:"date"`
 	Status string    `json:"status"`
@@ -56,4 +66,16 @@ type CreateScheduleMetaEntryRequestDTO struct {
 
 type CreateScheduleMetaRequestDTO struct {
 	List []CreateScheduleMetaEntryRequestDTO `json:"list"`
+}
+
+type GetScheduleRequestDTO struct {
+	Column   string    `json:"column"`
+	ColumnId uuid.UUID `json:"columnId"`
+	From     time.Time `json:"from"`
+	To       time.Time `json:"to"`
+}
+
+type GetScheduleGeneralRequestDTO struct {
+	Column   string    `json:"column"`
+	ColumnId uuid.UUID `json:"columnId"`
 }

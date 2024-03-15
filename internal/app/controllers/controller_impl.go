@@ -3,7 +3,6 @@ package controllers
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/stdyum/api-common/models"
@@ -13,13 +12,13 @@ import (
 	schedule "github.com/stdyum/api-schedule/internal/app/models"
 )
 
-func (c *controller) Schedule(ctx context.Context, enrollment models.Enrollment, column string, columnId uuid.UUID, from, to time.Time) (dto.ScheduleResponseDTO, error) {
-	col, ok := entities.ColumnFromString(column)
+func (c *controller) Schedule(ctx context.Context, enrollment models.Enrollment, request dto.GetScheduleRequestDTO) (dto.ScheduleResponseDTO, error) {
+	col, ok := entities.ColumnFromString(request.Column)
 	if !ok {
 		return dto.ScheduleResponseDTO{}, errors.New("no such column")
 	}
 
-	lessonsRaw, err := c.repository.GetSchedule(ctx, enrollment.StudyPlaceId, col, columnId, from, to)
+	lessonsRaw, err := c.repository.GetSchedule(ctx, enrollment.StudyPlaceId, col, request.ColumnId, request.From, request.To)
 	if err != nil {
 		return dto.ScheduleResponseDTO{}, err
 	}
@@ -87,21 +86,21 @@ func (c *controller) Schedule(ctx context.Context, enrollment models.Enrollment,
 		Info: dto.ScheduleInfoResponseDTO{
 			StudyPlaceId: enrollment.StudyPlaceId,
 			Column:       col.String(),
-			ColumnId:     columnId,
-			ColumnName:   col.Name(types, columnId),
-			StartDate:    from,
-			EndDate:      to,
+			ColumnId:     request.ColumnId,
+			ColumnName:   col.Name(types, request.ColumnId),
+			StartDate:    request.From,
+			EndDate:      request.To,
 		},
 	}, nil
 }
 
-func (c *controller) ScheduleGeneral(ctx context.Context, enrollment models.Enrollment, column string, columnId uuid.UUID) (dto.ScheduleGeneralResponseDTO, error) {
-	col, ok := entities.ColumnFromString(column)
+func (c *controller) ScheduleGeneral(ctx context.Context, enrollment models.Enrollment, request dto.GetScheduleGeneralRequestDTO) (dto.ScheduleGeneralResponseDTO, error) {
+	col, ok := entities.ColumnFromString(request.Column)
 	if !ok {
 		return dto.ScheduleGeneralResponseDTO{}, errors.New("no such column")
 	}
 
-	lessonsRaw, err := c.repository.GetScheduleGeneral(ctx, enrollment.StudyPlaceId, col, columnId)
+	lessonsRaw, err := c.repository.GetScheduleGeneral(ctx, enrollment.StudyPlaceId, col, request.ColumnId)
 	if err != nil {
 		return dto.ScheduleGeneralResponseDTO{}, err
 	}
@@ -167,14 +166,18 @@ func (c *controller) ScheduleGeneral(ctx context.Context, enrollment models.Enro
 		}),
 		Info: dto.ScheduleInfoResponseDTO{
 			StudyPlaceId: enrollment.StudyPlaceId,
-			ColumnId:     columnId,
+			ColumnId:     request.ColumnId,
 			Column:       col.String(),
-			ColumnName:   col.Name(types, columnId),
+			ColumnName:   col.Name(types, request.ColumnId),
 		},
 	}, nil
 }
 
 func (c *controller) CreateScheduleMeta(ctx context.Context, enrollment models.Enrollment, request dto.CreateScheduleMetaRequestDTO) (dto.CreateScheduleMetaResponseDTO, error) {
+	if err := c.validator.ValidateCreateScheduleMetaRequest(ctx, request); err != nil {
+		return dto.CreateScheduleMetaResponseDTO{}, err
+	}
+
 	if err := enrollment.Permissions.Assert(models.PermissionSchedule); err != nil {
 		return dto.CreateScheduleMetaResponseDTO{}, err
 	}
