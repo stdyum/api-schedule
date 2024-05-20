@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/gocql/gocql"
@@ -17,11 +18,25 @@ type DatabaseConfig struct {
 	Keyspace string `env:"KEYSPACE"`
 }
 
+type reconnectionPolicy struct {
+	maxRetries int
+	delay      time.Duration
+}
+
+func (r *reconnectionPolicy) GetInterval(currentRetry int) time.Duration {
+	slog.Info("Trying to reconnect to db instance", "currentRetry", currentRetry)
+	return r.delay
+}
+
+func (r *reconnectionPolicy) GetMaxRetries() int {
+	return r.maxRetries
+}
+
 func ConnectToDatabase(config DatabaseConfig) (*gocql.Session, error) {
 	retryPolicy := &gocql.ExponentialBackoffRetryPolicy{
 		Min:        time.Second,
 		Max:        10 * time.Second,
-		NumRetries: 5,
+		NumRetries: 50,
 	}
 
 	cluster := gocql.NewCluster(config.URL)
@@ -30,8 +45,12 @@ func ConnectToDatabase(config DatabaseConfig) (*gocql.Session, error) {
 		Password: config.Password,
 	}
 	cluster.Keyspace = config.Keyspace
-	cluster.Timeout = 5 * time.Second
+	cluster.Timeout = 60 * time.Second
 	cluster.RetryPolicy = retryPolicy
+	cluster.ReconnectionPolicy = &gocql.ConstantReconnectionPolicy{
+		MaxRetries: 100,
+		Interval:   1 * time.Second,
+	}
 	cluster.PoolConfig.HostSelectionPolicy = gocql.TokenAwareHostPolicy(gocql.RoundRobinHostPolicy())
 
 	session, err := cluster.CreateSession()

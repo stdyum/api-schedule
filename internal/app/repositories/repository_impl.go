@@ -20,6 +20,9 @@ func (r *repository) GetSchedule(ctx context.Context, studyPlaceId uuid.UUID, co
 		lessons   []entities.ScheduleLesson
 	}
 
+	from = from.Truncate(time.Hour * 24)
+	to = to.Truncate(time.Hour * 24)
+
 	daysAmount := int(to.Sub(from).Hours() / 24)
 	days := make(map[time.Time]*day, daysAmount)
 	for i := 0; i < daysAmount; i++ {
