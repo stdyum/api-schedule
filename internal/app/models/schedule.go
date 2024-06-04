@@ -17,8 +17,8 @@ type Lesson struct {
 	Teacher        models.Teacher
 	StartDateTime  time.Time
 	EndDateTime    time.Time
-	StartTime      time.Duration
-	EndTime        time.Duration
+	StartTime      int64
+	EndTime        int64
 	DayIndex       int
 	LessonIndex    int
 	PrimaryColor   string

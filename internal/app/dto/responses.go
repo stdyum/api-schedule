@@ -53,3 +53,23 @@ type CreateScheduleMetaEntryResponseDTO struct {
 type CreateScheduleMetaResponseDTO struct {
 	List []CreateScheduleMetaEntryResponseDTO `json:"list"`
 }
+
+type EntriesFilterResponseDTO struct {
+	TeacherId uuid.UUID
+	GroupId   uuid.UUID
+	SubjectId uuid.UUID
+}
+
+type LessonResponseDTO struct {
+	ID             uuid.UUID `json:"id"`
+	StudyPlaceId   uuid.UUID `json:"studyPlaceId"`
+	GroupId        uuid.UUID `json:"groupId"`
+	RoomId         uuid.UUID `json:"roomId"`
+	SubjectId      uuid.UUID `json:"subjectId"`
+	TeacherId      uuid.UUID `json:"teacherId"`
+	StartTime      time.Time `json:"startTime"`
+	EndTime        time.Time `json:"endTime"`
+	LessonIndex    int       `json:"lessonIndex"`
+	PrimaryColor   string    `json:"primaryColor"`
+	SecondaryColor string    `json:"secondaryColor"`
+}

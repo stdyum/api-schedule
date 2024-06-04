@@ -79,3 +79,9 @@ type GetScheduleGeneralRequestDTO struct {
 	Column   string    `json:"column"`
 	ColumnId uuid.UUID `json:"columnId"`
 }
+
+type EntriesFilterRequestDTO struct {
+	TeacherId uuid.UUID
+	GroupId   uuid.UUID
+	SubjectId uuid.UUID
+}

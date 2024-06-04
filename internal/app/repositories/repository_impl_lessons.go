@@ -6,8 +6,54 @@ import (
 
 	"github.com/gocql/gocql"
 	"github.com/google/uuid"
+	"github.com/stdyum/api-common/databases"
 	"github.com/stdyum/api-schedule/internal/app/entities"
 )
+
+func (r *repository) GetLessonByID(ctx context.Context, studyPlaceId uuid.UUID, id uuid.UUID) (entities.Lesson, error) {
+	scanner := r.database.Query(`
+SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, date, start_time, end_time, lesson_index, primary_color, secondary_color 
+FROM schedule.lessons
+WHERE study_place_id = ? AND id = ? ALLOW FILTERING`,
+		gocql.UUID(studyPlaceId),
+		gocql.UUID(id),
+	).
+		WithContext(ctx)
+
+	return r.scanLesson(scanner)
+}
+
+func (r *repository) GetLessons(ctx context.Context, studyPlaceId uuid.UUID, teacherId uuid.UUID, subjectId uuid.UUID, groupId uuid.UUID) ([]entities.Lesson, error) {
+	query := `
+SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, date, start_time, end_time, lesson_index, primary_color, secondary_color
+FROM schedule.lessons
+WHERE study_place_id = ?`
+	params := []any{gocql.UUID(studyPlaceId)}
+
+	if teacherId != uuid.Nil {
+		query += "AND teacher_id = ? "
+		params = append(params, gocql.UUID(teacherId))
+	}
+
+	if subjectId != uuid.Nil {
+		query += "AND subject_id = ? "
+		params = append(params, gocql.UUID(subjectId))
+	}
+
+	if groupId != uuid.Nil {
+		query += "AND group_id = ? "
+		params = append(params, gocql.UUID(groupId))
+	}
+
+	query += "ALLOW FILTERING"
+
+	scanner := r.database.Query(query, params...).
+		WithContext(ctx).
+		Iter().
+		Scanner()
+
+	return databases.ScanArray(scanner, r.scanLesson)
+}
 
 func (r *repository) CreateLessons(ctx context.Context, lessons []entities.Lesson) error {
 	query := "BEGIN BATCH"

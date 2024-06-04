@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log/slog"
 	"time"
 
 	"github.com/gocql/gocql"
@@ -16,20 +15,6 @@ type DatabaseConfig struct {
 	Username string `env:"USERNAME"`
 	Password string `env:"PASSWORD"`
 	Keyspace string `env:"KEYSPACE"`
-}
-
-type reconnectionPolicy struct {
-	maxRetries int
-	delay      time.Duration
-}
-
-func (r *reconnectionPolicy) GetInterval(currentRetry int) time.Duration {
-	slog.Info("Trying to reconnect to db instance", "currentRetry", currentRetry)
-	return r.delay
-}
-
-func (r *reconnectionPolicy) GetMaxRetries() int {
-	return r.maxRetries
 }
 
 func ConnectToDatabase(config DatabaseConfig) (*gocql.Session, error) {

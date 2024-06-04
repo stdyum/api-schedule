@@ -14,6 +14,8 @@ type Repository interface {
 	GetScheduleGeneral(ctx context.Context, studyPlaceId uuid.UUID, column entities.Column, columnId uuid.UUID) ([]entities.LessonGeneral, error)
 	CreateScheduleMeta(ctx context.Context, meta []entities.Schedule) error
 
+	GetLessonByID(ctx context.Context, studyPlaceId uuid.UUID, id uuid.UUID) (entities.Lesson, error)
+	GetLessons(ctx context.Context, studyPlaceId uuid.UUID, teacherId uuid.UUID, subjectId uuid.UUID, groupId uuid.UUID) ([]entities.Lesson, error)
 	CreateLessons(ctx context.Context, lesson []entities.Lesson) error
 	UpdateLesson(ctx context.Context, lesson entities.Lesson) error
 	DeleteLessonById(ctx context.Context, studyPlaceId uuid.UUID, date time.Time, id uuid.UUID) error
@@ -21,6 +23,8 @@ type Repository interface {
 	CreateGeneralLessons(ctx context.Context, lesson []entities.LessonGeneral) error
 	UpdateGeneralLesson(ctx context.Context, lesson entities.LessonGeneral) error
 	DeleteGeneralLessonById(ctx context.Context, studyPlaceId uuid.UUID, dayIndex int, id uuid.UUID) error
+
+	GetUniqueEntries(ctx context.Context, studyPlaceId uuid.UUID, teacherId uuid.UUID, subjectId uuid.UUID, groupId uuid.UUID) ([]entities.Entry, error)
 }
 
 type repository struct {

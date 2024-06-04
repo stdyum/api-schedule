@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/stdyum/api-common/models"
 	"github.com/stdyum/api-schedule/internal/app/controllers/validators"
 	"github.com/stdyum/api-schedule/internal/app/dto"
@@ -15,6 +16,8 @@ type Controller interface {
 	ScheduleGeneral(ctx context.Context, enrollment models.Enrollment, request dto.GetScheduleGeneralRequestDTO) (dto.ScheduleGeneralResponseDTO, error)
 	CreateScheduleMeta(ctx context.Context, enrollment models.Enrollment, request dto.CreateScheduleMetaRequestDTO) (dto.CreateScheduleMetaResponseDTO, error)
 
+	GetLessonById(ctx context.Context, enrollment models.Enrollment, id uuid.UUID) (dto.LessonResponseDTO, error)
+	GetLessons(ctx context.Context, enrollment models.Enrollment, filter dto.EntriesFilterRequestDTO) ([]dto.LessonResponseDTO, error)
 	CreateLessons(ctx context.Context, enrollment models.Enrollment, request dto.CreateLessonsRequestDTO) (dto.CreateLessonsResponseDTO, error)
 	UpdateLesson(ctx context.Context, enrollment models.Enrollment, request dto.UpdateLessonRequestDTO) error
 	DeleteLessonById(ctx context.Context, enrollment models.Enrollment, request dto.DeleteLessonRequestDTO) error
@@ -22,6 +25,8 @@ type Controller interface {
 	CreateLessonsGeneral(ctx context.Context, enrollment models.Enrollment, request dto.CreateLessonsGeneralRequestDTO) (dto.CreateLessonsGeneralResponseDTO, error)
 	UpdateLessonGeneral(ctx context.Context, enrollment models.Enrollment, request dto.UpdateLessonGeneralRequestDTO) error
 	DeleteLessonGeneralById(ctx context.Context, enrollment models.Enrollment, request dto.DeleteLessonGeneralRequestDTO) error
+
+	GetUniqueEntries(ctx context.Context, enrollment models.Enrollment, filter dto.EntriesFilterRequestDTO) ([]dto.EntriesFilterResponseDTO, error)
 }
 
 type controller struct {

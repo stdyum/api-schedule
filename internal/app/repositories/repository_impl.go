@@ -80,7 +80,7 @@ SELECT id, study_place_id, date, status FROM schedule.schedule
 
 	//language=SQL
 	query = fmt.Sprintf(`
-SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, date, start_time, end_time, lesson_index, primary_color, secondary_color  FROM schedule.lessons 
+SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, date, start_time, end_time, lesson_index, primary_color, secondary_color FROM schedule.lessons 
     WHERE study_place_id = ? AND date IN ? AND %s = ?
 `, string(column))
 
@@ -219,4 +219,55 @@ VALUES (?, ?, ?, ?, dateOf(now()), dateOf(now()));
 	query += "APPLY BATCH;"
 
 	return r.database.Query(query, args...).WithContext(ctx).Exec()
+}
+
+func (r *repository) GetUniqueEntries(ctx context.Context, studyPlaceId uuid.UUID, teacherId uuid.UUID, subjectId uuid.UUID, groupId uuid.UUID) ([]entities.Entry, error) {
+	query := `
+SELECT study_place_id, group_id, subject_id, teacher_id
+FROM schedule.lessons
+WHERE study_place_id = ?`
+	params := []any{gocql.UUID(studyPlaceId)}
+
+	if teacherId != uuid.Nil {
+		query += "AND teacher_id = ? "
+		params = append(params, gocql.UUID(teacherId))
+	}
+
+	if subjectId != uuid.Nil {
+		query += "AND subject_id = ? "
+		params = append(params, gocql.UUID(subjectId))
+	}
+
+	if groupId != uuid.Nil {
+		query += "AND group_id = ? "
+		params = append(params, gocql.UUID(groupId))
+	}
+
+	query += "ALLOW FILTERING"
+
+	scanner := r.database.Query(query, params...).
+		WithContext(ctx).
+		Iter().
+		Scanner()
+
+	entriesMap := make(map[entities.Entry]bool)
+	for scanner.Next() {
+		entry, err := r.scanEntry(scanner)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, ok := entriesMap[entry]; ok {
+			continue
+		}
+
+		entriesMap[entry] = true
+	}
+
+	entries := make([]entities.Entry, 0, len(entriesMap))
+	for entry := range entriesMap {
+		entries = append(entries, entry)
+	}
+
+	return entries, nil
 }

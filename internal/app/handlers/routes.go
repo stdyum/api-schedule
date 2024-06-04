@@ -3,6 +3,7 @@ package handlers
 import (
 	"github.com/stdyum/api-common/hc"
 	"github.com/stdyum/api-common/http/middlewares"
+	"github.com/stdyum/api-common/proto/impl/schedule"
 	"google.golang.org/grpc"
 )
 
@@ -35,5 +36,7 @@ func (h *http) ConfigureRoutes() *hc.Engine {
 }
 
 func (h *gRPC) ConfigureRoutes() *grpc.Server {
-	return nil
+	grpcServer := grpc.NewServer()
+	schedule.RegisterScheduleServer(grpcServer, h)
+	return grpcServer
 }

@@ -38,8 +38,8 @@ type ScheduleLessonGeneralResponseDTO struct {
 	Room           ScheduleLessonRoomResponseDTO    `json:"room"`
 	Subject        ScheduleLessonSubjectResponseDTO `json:"subject"`
 	Teacher        ScheduleLessonTeacherResponseDTO `json:"teacher"`
-	StartTime      time.Duration                    `json:"startTime"`
-	EndTime        time.Duration                    `json:"endTime"`
+	StartTime      int64                            `json:"startTime"`
+	EndTime        int64                            `json:"endTime"`
 	DayIndex       int                              `json:"dayIndex"`
 	LessonIndex    int                              `json:"lessonIndex"`
 	PrimaryColor   string                           `json:"primaryColor"`

@@ -121,8 +121,8 @@ func (c *controller) ScheduleGeneral(ctx context.Context, enrollment models.Enro
 			Teacher: models.Teacher{
 				ID: item.TeacherId,
 			},
-			StartTime:      item.StartTime,
-			EndTime:        item.EndTime,
+			StartTime:      int64(item.StartTime.Minutes()),
+			EndTime:        int64(item.EndTime.Minutes()),
 			DayIndex:       item.DayIndex,
 			LessonIndex:    item.LessonIndex,
 			PrimaryColor:   item.PrimaryColor,
@@ -205,4 +205,22 @@ func (c *controller) CreateScheduleMeta(ctx context.Context, enrollment models.E
 			}
 		}),
 	}, nil
+}
+
+func (c *controller) GetUniqueEntries(ctx context.Context, enrollment models.Enrollment, filter dto.EntriesFilterRequestDTO) ([]dto.EntriesFilterResponseDTO, error) {
+	entries, err := c.repository.GetUniqueEntries(ctx, enrollment.StudyPlaceId, filter.TeacherId, filter.SubjectId, filter.GroupId)
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]dto.EntriesFilterResponseDTO, len(entries))
+	for i, entry := range entries {
+		out[i] = dto.EntriesFilterResponseDTO{
+			TeacherId: entry.TeacherId,
+			GroupId:   entry.GroupId,
+			SubjectId: entry.SubjectId,
+		}
+	}
+
+	return out, nil
 }
