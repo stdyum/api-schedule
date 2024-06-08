@@ -8,6 +8,7 @@ import (
 	"github.com/stdyum/api-common/uslices"
 	"github.com/stdyum/api-schedule/internal/app/dto"
 	"github.com/stdyum/api-schedule/internal/app/entities"
+	"github.com/stdyum/api-schedule/pkg/uuuid"
 )
 
 func (c *controller) GetLessonById(ctx context.Context, enrollment models.Enrollment, id uuid.UUID) (dto.LessonResponseDTO, error) {
@@ -55,15 +56,16 @@ func (c *controller) GetLessons(ctx context.Context, enrollment models.Enrollmen
 }
 
 func (c *controller) CreateLessons(ctx context.Context, enrollment models.Enrollment, request dto.CreateLessonsRequestDTO) (dto.CreateLessonsResponseDTO, error) {
-	if err := c.validator.ValidateCreateLessonsRequest(ctx, request); err != nil {
-		return dto.CreateLessonsResponseDTO{}, err
-	}
+	//if err := c.validator.ValidateCreateLessonsRequest(ctx, request); err != nil {
+	//	return dto.CreateLessonsResponseDTO{}, err
+	//}
 
 	if err := enrollment.Permissions.Assert(models.PermissionSchedule); err != nil {
 		return dto.CreateLessonsResponseDTO{}, err
 	}
 
 	lessons := make([]entities.Lesson, len(request.List))
+	entries := make([]entities.UniqueEntry, len(request.List))
 	for i, lessonDTO := range request.List {
 		lessons[i] = entities.Lesson{
 			ID:             uuid.New(),
@@ -78,9 +80,21 @@ func (c *controller) CreateLessons(ctx context.Context, enrollment models.Enroll
 			PrimaryColor:   lessonDTO.PrimaryColor,
 			SecondaryColor: lessonDTO.SecondaryColor,
 		}
+
+		entries[i] = entities.UniqueEntry{
+			Id:           uuuid.UUIDsToBase56("", lessonDTO.GroupId, lessonDTO.SubjectId, lessonDTO.TeacherId),
+			StudyPlaceId: enrollment.StudyPlaceId,
+			GroupId:      lessonDTO.GroupId,
+			SubjectId:    lessonDTO.SubjectId,
+			TeacherId:    lessonDTO.TeacherId,
+		}
 	}
 
 	if err := c.repository.CreateLessons(ctx, lessons); err != nil {
+		return dto.CreateLessonsResponseDTO{}, err
+	}
+
+	if err := c.repository.CreateUniqueEntries(ctx, entries); err != nil {
 		return dto.CreateLessonsResponseDTO{}, err
 	}
 

@@ -91,13 +91,14 @@ func (r *repository) scanLessonGeneral(sc databases.Scan) (lesson entities.Lesso
 	return
 }
 
-func (r *repository) scanEntry(sc databases.Scan) (lesson entities.Entry, err error) {
+func (r *repository) scanUniqueEntry(sc databases.Scan) (lesson entities.UniqueEntry, err error) {
 	var studyPlaceId gocql.UUID
 	var groupId gocql.UUID
 	var subjectId gocql.UUID
 	var teacherId gocql.UUID
 
 	if err = sc.Scan(
+		&lesson.Id,
 		&studyPlaceId,
 		&groupId,
 		&subjectId,

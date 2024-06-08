@@ -4,7 +4,8 @@ import (
 	"github.com/google/uuid"
 )
 
-type Entry struct {
+type UniqueEntry struct {
+	Id           string
 	StudyPlaceId uuid.UUID
 	TeacherId    uuid.UUID
 	SubjectId    uuid.UUID

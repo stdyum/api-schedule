@@ -174,9 +174,9 @@ func (c *controller) ScheduleGeneral(ctx context.Context, enrollment models.Enro
 }
 
 func (c *controller) CreateScheduleMeta(ctx context.Context, enrollment models.Enrollment, request dto.CreateScheduleMetaRequestDTO) (dto.CreateScheduleMetaResponseDTO, error) {
-	if err := c.validator.ValidateCreateScheduleMetaRequest(ctx, request); err != nil {
-		return dto.CreateScheduleMetaResponseDTO{}, err
-	}
+	//if err := c.validator.ValidateCreateScheduleMetaRequest(ctx, request); err != nil {
+	//	return dto.CreateScheduleMetaResponseDTO{}, err
+	//}
 
 	if err := enrollment.Permissions.Assert(models.PermissionSchedule); err != nil {
 		return dto.CreateScheduleMetaResponseDTO{}, err
@@ -207,19 +207,32 @@ func (c *controller) CreateScheduleMeta(ctx context.Context, enrollment models.E
 	}, nil
 }
 
-func (c *controller) GetUniqueEntries(ctx context.Context, enrollment models.Enrollment, filter dto.EntriesFilterRequestDTO) ([]dto.EntriesFilterResponseDTO, error) {
-	entries, err := c.repository.GetUniqueEntries(ctx, enrollment.StudyPlaceId, filter.TeacherId, filter.SubjectId, filter.GroupId)
+func (c *controller) GetUniqueEntries(ctx context.Context, enrollment models.Enrollment, filter dto.EntriesFilterRequestDTO, cursor string, limit int) (dto.EntriesFilterResponseDTO, error) {
+	entries, err := c.repository.GetUniqueEntries(ctx, enrollment.StudyPlaceId, filter.TeacherId, filter.SubjectId, filter.GroupId, cursor, limit)
 	if err != nil {
-		return nil, err
+		return dto.EntriesFilterResponseDTO{}, err
 	}
 
-	out := make([]dto.EntriesFilterResponseDTO, len(entries))
+	items := make([]dto.EntriesFilterItemResponseDTO, len(entries))
 	for i, entry := range entries {
-		out[i] = dto.EntriesFilterResponseDTO{
-			TeacherId: entry.TeacherId,
+		items[i] = dto.EntriesFilterItemResponseDTO{
+			Id:        entry.Id,
 			GroupId:   entry.GroupId,
 			SubjectId: entry.SubjectId,
+			TeacherId: entry.TeacherId,
 		}
+	}
+
+	if len(items) == 0 {
+		return dto.EntriesFilterResponseDTO{}, nil
+	}
+
+	lastItem := entries[len(items)-1]
+
+	out := dto.EntriesFilterResponseDTO{
+		Items: items,
+		Next:  lastItem.Id,
+		Limit: limit,
 	}
 
 	return out, nil

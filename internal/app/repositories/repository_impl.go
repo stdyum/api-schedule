@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gocql/gocql"
@@ -221,53 +222,69 @@ VALUES (?, ?, ?, ?, dateOf(now()), dateOf(now()));
 	return r.database.Query(query, args...).WithContext(ctx).Exec()
 }
 
-func (r *repository) GetUniqueEntries(ctx context.Context, studyPlaceId uuid.UUID, teacherId uuid.UUID, subjectId uuid.UUID, groupId uuid.UUID) ([]entities.Entry, error) {
-	query := `
-SELECT study_place_id, group_id, subject_id, teacher_id
-FROM schedule.lessons
-WHERE study_place_id = ?`
+func (r *repository) CreateUniqueEntries(ctx context.Context, entries []entities.UniqueEntry) error {
+	query := "BEGIN BATCH"
+
+	var args []any
+	for _, lesson := range entries {
+		query += `
+INSERT INTO schedule.unique_entries 
+    (study_place_id, id, group_id, subject_id, teacher_id, created_at, updated_at)
+VALUES (?, ?, ?, ?, ?, dateOf(now()), dateOf(now()));
+`
+
+		args = append(args, []any{
+			gocql.UUID(lesson.StudyPlaceId),
+			lesson.Id,
+			gocql.UUID(lesson.GroupId),
+			gocql.UUID(lesson.SubjectId),
+			gocql.UUID(lesson.TeacherId),
+		}...)
+	}
+	query += "APPLY BATCH;"
+
+	return r.database.Query(query, args...).WithContext(ctx).Exec()
+}
+
+func (r *repository) GetUniqueEntries(ctx context.Context, studyPlaceId uuid.UUID, teacherId uuid.UUID, subjectId uuid.UUID, groupId uuid.UUID, cursor string, limit int) ([]entities.UniqueEntry, error) {
+	var queryBuilder strings.Builder
 	params := []any{gocql.UUID(studyPlaceId)}
 
+	queryBuilder.WriteString(`
+SELECT id, study_place_id, group_id, subject_id, teacher_id
+FROM schedule.unique_entries
+WHERE study_place_id = ? `,
+	)
+
+	if cursor != "" {
+		queryBuilder.WriteString(" AND id > ? ")
+		params = append(params, cursor)
+	}
+
 	if teacherId != uuid.Nil {
-		query += "AND teacher_id = ? "
+		queryBuilder.WriteString("AND teacher_id = ? ")
 		params = append(params, gocql.UUID(teacherId))
 	}
 
 	if subjectId != uuid.Nil {
-		query += "AND subject_id = ? "
+		queryBuilder.WriteString("AND subject_id = ? ")
 		params = append(params, gocql.UUID(subjectId))
 	}
 
 	if groupId != uuid.Nil {
-		query += "AND group_id = ? "
+		queryBuilder.WriteString("AND group_id = ? ")
 		params = append(params, gocql.UUID(groupId))
 	}
 
-	query += "ALLOW FILTERING"
+	if limit != 0 {
+		queryBuilder.WriteString("LIMIT ?")
+		params = append(params, limit)
+	}
 
-	scanner := r.database.Query(query, params...).
+	scanner := r.database.Query(queryBuilder.String(), params...).
 		WithContext(ctx).
 		Iter().
 		Scanner()
 
-	entriesMap := make(map[entities.Entry]bool)
-	for scanner.Next() {
-		entry, err := r.scanEntry(scanner)
-		if err != nil {
-			return nil, err
-		}
-
-		if _, ok := entriesMap[entry]; ok {
-			continue
-		}
-
-		entriesMap[entry] = true
-	}
-
-	entries := make([]entities.Entry, 0, len(entriesMap))
-	for entry := range entriesMap {
-		entries = append(entries, entry)
-	}
-
-	return entries, nil
+	return databases.ScanArray(scanner, r.scanUniqueEntry)
 }

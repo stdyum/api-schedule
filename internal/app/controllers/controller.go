@@ -26,7 +26,7 @@ type Controller interface {
 	UpdateLessonGeneral(ctx context.Context, enrollment models.Enrollment, request dto.UpdateLessonGeneralRequestDTO) error
 	DeleteLessonGeneralById(ctx context.Context, enrollment models.Enrollment, request dto.DeleteLessonGeneralRequestDTO) error
 
-	GetUniqueEntries(ctx context.Context, enrollment models.Enrollment, filter dto.EntriesFilterRequestDTO) ([]dto.EntriesFilterResponseDTO, error)
+	GetUniqueEntries(ctx context.Context, enrollment models.Enrollment, filter dto.EntriesFilterRequestDTO, cursor string, limit int) (dto.EntriesFilterResponseDTO, error)
 }
 
 type controller struct {

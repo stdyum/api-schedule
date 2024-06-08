@@ -11,9 +11,9 @@ import (
 )
 
 func (c *controller) CreateLessonsGeneral(ctx context.Context, enrollment models.Enrollment, request dto.CreateLessonsGeneralRequestDTO) (dto.CreateLessonsGeneralResponseDTO, error) {
-	if err := c.validator.ValidateCreateLessonsGeneralRequest(ctx, request); err != nil {
-		return dto.CreateLessonsGeneralResponseDTO{}, err
-	}
+	//if err := c.validator.ValidateCreateLessonsGeneralRequest(ctx, request); err != nil {
+	//	return dto.CreateLessonsGeneralResponseDTO{}, err
+	//}
 
 	if err := enrollment.Permissions.Assert(models.PermissionSchedule); err != nil {
 		return dto.CreateLessonsGeneralResponseDTO{}, err

@@ -122,16 +122,18 @@ func (h *gRPC) GetUniqueEntries(ctx context.Context, filter *schedule.EntriesFil
 		SubjectId: subjectId,
 	}
 
-	entries, err := h.controller.GetUniqueEntries(ctx, enrollmentUser.Enrollment, in)
+	entries, err := h.controller.GetUniqueEntries(ctx, enrollmentUser.Enrollment, in, filter.Cursor, int(filter.Limit))
 	if err != nil {
 		return nil, err
 	}
 
 	out := schedule.Entries{
-		List: make([]*schedule.Entry, len(entries)),
+		List:  make([]*schedule.Entry, len(entries.Items)),
+		Next:  entries.Next,
+		Limit: int32(entries.Limit),
 	}
 
-	for i, entry := range entries {
+	for i, entry := range entries.Items {
 		out.List[i] = &schedule.Entry{
 			TeacherId: entry.TeacherId.String(),
 			GroupId:   entry.GroupId.String(),

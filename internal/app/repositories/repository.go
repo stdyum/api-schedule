@@ -24,7 +24,8 @@ type Repository interface {
 	UpdateGeneralLesson(ctx context.Context, lesson entities.LessonGeneral) error
 	DeleteGeneralLessonById(ctx context.Context, studyPlaceId uuid.UUID, dayIndex int, id uuid.UUID) error
 
-	GetUniqueEntries(ctx context.Context, studyPlaceId uuid.UUID, teacherId uuid.UUID, subjectId uuid.UUID, groupId uuid.UUID) ([]entities.Entry, error)
+	CreateUniqueEntries(ctx context.Context, entries []entities.UniqueEntry) error
+	GetUniqueEntries(ctx context.Context, studyPlaceId uuid.UUID, teacherId uuid.UUID, subjectId uuid.UUID, groupId uuid.UUID, cursor string, limit int) ([]entities.UniqueEntry, error)
 }
 
 type repository struct {

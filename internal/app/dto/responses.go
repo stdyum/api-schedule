@@ -55,6 +55,13 @@ type CreateScheduleMetaResponseDTO struct {
 }
 
 type EntriesFilterResponseDTO struct {
+	Items []EntriesFilterItemResponseDTO
+	Next  string
+	Limit int
+}
+
+type EntriesFilterItemResponseDTO struct {
+	Id        string
 	TeacherId uuid.UUID
 	GroupId   uuid.UUID
 	SubjectId uuid.UUID
