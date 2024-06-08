@@ -56,9 +56,9 @@ func (c *controller) GetLessons(ctx context.Context, enrollment models.Enrollmen
 }
 
 func (c *controller) CreateLessons(ctx context.Context, enrollment models.Enrollment, request dto.CreateLessonsRequestDTO) (dto.CreateLessonsResponseDTO, error) {
-	//if err := c.validator.ValidateCreateLessonsRequest(ctx, request); err != nil {
-	//	return dto.CreateLessonsResponseDTO{}, err
-	//}
+	if err := c.validator.ValidateCreateLessonsRequest(ctx, request); err != nil {
+		return dto.CreateLessonsResponseDTO{}, err
+	}
 
 	if err := enrollment.Permissions.Assert(models.PermissionSchedule); err != nil {
 		return dto.CreateLessonsResponseDTO{}, err

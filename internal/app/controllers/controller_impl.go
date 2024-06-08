@@ -174,9 +174,9 @@ func (c *controller) ScheduleGeneral(ctx context.Context, enrollment models.Enro
 }
 
 func (c *controller) CreateScheduleMeta(ctx context.Context, enrollment models.Enrollment, request dto.CreateScheduleMetaRequestDTO) (dto.CreateScheduleMetaResponseDTO, error) {
-	//if err := c.validator.ValidateCreateScheduleMetaRequest(ctx, request); err != nil {
-	//	return dto.CreateScheduleMetaResponseDTO{}, err
-	//}
+	if err := c.validator.ValidateCreateScheduleMetaRequest(ctx, request); err != nil {
+		return dto.CreateScheduleMetaResponseDTO{}, err
+	}
 
 	if err := enrollment.Permissions.Assert(models.PermissionSchedule); err != nil {
 		return dto.CreateScheduleMetaResponseDTO{}, err
