@@ -7,6 +7,7 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/google/uuid"
 	"github.com/stdyum/api-common/databases"
+	"github.com/stdyum/api-common/uslices"
 	"github.com/stdyum/api-schedule/internal/app/entities"
 )
 
@@ -23,7 +24,7 @@ WHERE study_place_id = ? AND id = ? ALLOW FILTERING`,
 	return r.scanLesson(scanner)
 }
 
-func (r *repository) GetLessons(ctx context.Context, studyPlaceId uuid.UUID, teacherId uuid.UUID, subjectId uuid.UUID, groupId uuid.UUID) ([]entities.Lesson, error) {
+func (r *repository) GetLessons(ctx context.Context, studyPlaceId uuid.UUID, teacherId uuid.UUID, subjectId uuid.UUID, groupIds []uuid.UUID) ([]entities.Lesson, error) {
 	query := `
 SELECT id, study_place_id, group_id, room_id, subject_id, teacher_id, date, start_time, end_time, lesson_index, primary_color, secondary_color
 FROM schedule.lessons
@@ -40,9 +41,11 @@ WHERE study_place_id = ?`
 		params = append(params, gocql.UUID(subjectId))
 	}
 
-	if groupId != uuid.Nil {
-		query += "AND group_id = ? "
-		params = append(params, gocql.UUID(groupId))
+	if len(groupIds) > 0 {
+		query += "AND group_id IN ? "
+		params = append(params, uslices.MapFunc(groupIds, func(item uuid.UUID) gocql.UUID {
+			return gocql.UUID(item)
+		}))
 	}
 
 	query += "ALLOW FILTERING"

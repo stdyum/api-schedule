@@ -82,6 +82,6 @@ type GetScheduleGeneralRequestDTO struct {
 
 type EntriesFilterRequestDTO struct {
 	TeacherId uuid.UUID
-	GroupId   uuid.UUID
+	GroupIds  []uuid.UUID
 	SubjectId uuid.UUID
 }

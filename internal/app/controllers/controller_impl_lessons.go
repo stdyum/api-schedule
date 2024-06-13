@@ -33,7 +33,7 @@ func (c *controller) GetLessonById(ctx context.Context, enrollment models.Enroll
 }
 
 func (c *controller) GetLessons(ctx context.Context, enrollment models.Enrollment, filter dto.EntriesFilterRequestDTO) ([]dto.LessonResponseDTO, error) {
-	lessons, err := c.repository.GetLessons(ctx, enrollment.StudyPlaceId, filter.TeacherId, filter.SubjectId, filter.GroupId)
+	lessons, err := c.repository.GetLessons(ctx, enrollment.StudyPlaceId, filter.TeacherId, filter.SubjectId, filter.GroupIds)
 	if err != nil {
 		return nil, err
 	}
@@ -56,9 +56,9 @@ func (c *controller) GetLessons(ctx context.Context, enrollment models.Enrollmen
 }
 
 func (c *controller) CreateLessons(ctx context.Context, enrollment models.Enrollment, request dto.CreateLessonsRequestDTO) (dto.CreateLessonsResponseDTO, error) {
-	if err := c.validator.ValidateCreateLessonsRequest(ctx, request); err != nil {
-		return dto.CreateLessonsResponseDTO{}, err
-	}
+	//if err := c.validator.ValidateCreateLessonsRequest(ctx, request); err != nil {
+	//	return dto.CreateLessonsResponseDTO{}, err
+	//}
 
 	if err := enrollment.Permissions.Assert(models.PermissionSchedule); err != nil {
 		return dto.CreateLessonsResponseDTO{}, err

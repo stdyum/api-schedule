@@ -246,7 +246,7 @@ VALUES (?, ?, ?, ?, ?, dateOf(now()), dateOf(now()));
 	return r.database.Query(query, args...).WithContext(ctx).Exec()
 }
 
-func (r *repository) GetUniqueEntries(ctx context.Context, studyPlaceId uuid.UUID, teacherId uuid.UUID, subjectId uuid.UUID, groupId uuid.UUID, cursor string, limit int) ([]entities.UniqueEntry, error) {
+func (r *repository) GetUniqueEntries(ctx context.Context, studyPlaceId uuid.UUID, teacherId uuid.UUID, subjectId uuid.UUID, groupIds []uuid.UUID, cursor string, limit int) ([]entities.UniqueEntry, error) {
 	var queryBuilder strings.Builder
 	params := []any{gocql.UUID(studyPlaceId)}
 
@@ -271,9 +271,11 @@ WHERE study_place_id = ? `,
 		params = append(params, gocql.UUID(subjectId))
 	}
 
-	if groupId != uuid.Nil {
-		queryBuilder.WriteString("AND group_id = ? ")
-		params = append(params, gocql.UUID(groupId))
+	if len(groupIds) > 0 {
+		queryBuilder.WriteString("AND group_id IN ? ")
+		params = append(params, uslices.MapFunc(groupIds, func(item uuid.UUID) gocql.UUID {
+			return gocql.UUID(item)
+		}))
 	}
 
 	if limit != 0 {
@@ -281,6 +283,7 @@ WHERE study_place_id = ? `,
 		params = append(params, limit)
 	}
 
+	queryBuilder.WriteString(" ALLOW FILTERING")
 	scanner := r.database.Query(queryBuilder.String(), params...).
 		WithContext(ctx).
 		Iter().

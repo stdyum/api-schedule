@@ -53,7 +53,7 @@ func main() {
 				StudyPlaceId: uuid.MustParse("ae2bdeb1-a820-49c1-adca-4405be0034ee"),
 				Permissions:  []models.Permission{models.PermissionAdmin},
 			},
-			lessonsAmount:        22500,
+			lessonsAmount:        2250,
 			generalLessonsAmount: 450,
 			lessonDuration:       time.Minute * 45,
 			times: []time.Duration{

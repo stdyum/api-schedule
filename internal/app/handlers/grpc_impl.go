@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stdyum/api-common/grpc"
 	"github.com/stdyum/api-common/proto/impl/schedule"
+	"github.com/stdyum/api-common/uslices"
 	"github.com/stdyum/api-schedule/internal/app/dto"
 )
 
@@ -51,7 +52,9 @@ func (h *gRPC) GetLessons(ctx context.Context, filter *schedule.EntriesFilter) (
 		return nil, err
 	}
 
-	groupId, err := uuid.Parse(filter.GroupId)
+	groupIds, err := uslices.MapFuncErr(filter.GroupIds, func(item string) (uuid.UUID, error) {
+		return uuid.Parse(item)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +66,7 @@ func (h *gRPC) GetLessons(ctx context.Context, filter *schedule.EntriesFilter) (
 
 	in := dto.EntriesFilterRequestDTO{
 		TeacherId: teacherId,
-		GroupId:   groupId,
+		GroupIds:  groupIds,
 		SubjectId: subjectId,
 	}
 
@@ -106,7 +109,9 @@ func (h *gRPC) GetUniqueEntries(ctx context.Context, filter *schedule.EntriesFil
 		return nil, err
 	}
 
-	groupId, err := uuid.Parse(filter.GroupId)
+	groupIds, err := uslices.MapFuncErr(filter.GroupIds, func(item string) (uuid.UUID, error) {
+		return uuid.Parse(item)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +123,7 @@ func (h *gRPC) GetUniqueEntries(ctx context.Context, filter *schedule.EntriesFil
 
 	in := dto.EntriesFilterRequestDTO{
 		TeacherId: teacherId,
-		GroupId:   groupId,
+		GroupIds:  groupIds,
 		SubjectId: subjectId,
 	}
 
